@@ -22,4 +22,12 @@ public class UploadService {
                 ObjectUtils.asMap("resource_type", "auto"));
         return uploadResult.get("secure_url").toString();
     }
+    public String uploadBytes(byte[] bytes, String filename) throws IOException {
+        Map uploadResult = cloudinary.uploader().upload(bytes,
+                ObjectUtils.asMap(
+                        "resource_type", "image",
+                        "public_id", filename.replace(".png", "")
+                ));
+        return uploadResult.get("secure_url").toString();
+    }
 }

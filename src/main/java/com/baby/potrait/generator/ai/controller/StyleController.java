@@ -45,4 +45,5 @@ public class StyleController {
         
         return ResponseEntity.ok(updatedPortrait);
     }
+
 }

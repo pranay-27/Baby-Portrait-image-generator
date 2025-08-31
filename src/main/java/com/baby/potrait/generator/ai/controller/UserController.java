@@ -3,6 +3,7 @@ package com.baby.potrait.generator.ai.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,20 +13,25 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baby.potrait.generator.ai.entity.User;
 import com.baby.potrait.generator.ai.service.UserService;
 
-@RestController
+@Controller
 @RequestMapping("/api")
 public class UserController {
 
     private final UserService userService;
 
-    @Autowired
     public UserController(UserService userService) {
+
         this.userService = userService;
     }
 
-    @GetMapping("/hello")
+    @GetMapping()
     public String sayHello() {
-        return "Hello World!!!";
+
+        return "home";
+    }
+    @GetMapping("/create")
+    public String getCreateForm(){
+        return "create";
     }
 
     @GetMapping("/users")

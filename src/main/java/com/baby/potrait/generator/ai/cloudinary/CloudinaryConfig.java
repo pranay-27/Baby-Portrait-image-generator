@@ -22,4 +22,5 @@ public class CloudinaryConfig {
                 "api_secret", dotenv.get("CLOUDINARY_API_SECRET")
         ));
     }
+    
 }

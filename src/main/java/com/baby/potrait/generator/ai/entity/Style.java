@@ -29,6 +29,7 @@ public class Style {
         this.sampleImageUrl = sampleImageUrl;
     }
 
+
     public Long getId() {
         return id;
     }

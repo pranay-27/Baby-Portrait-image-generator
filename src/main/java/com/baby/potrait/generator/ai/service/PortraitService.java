@@ -18,6 +18,7 @@ public class PortraitService {
     private UploadService uploadServiceService;
     private final StyleService styleService;
 
+
     public PortraitService(PortraitRepository portraitRepository, UploadService uploadServiceService, StyleService styleService) {
         this.portraitRepository = portraitRepository;
         this.uploadServiceService = uploadServiceService;
@@ -33,6 +34,14 @@ public class PortraitService {
         return portraitRepository.save(portrait);
     }
 
+    public List<Portrait> getPortraitsByUser(User user) {
+        return portraitRepository.findByUser(user);
+    }
+
+    public List<Portrait> getAllPortraits() {
+        return portraitRepository.findAll();
+    }
+
     public Optional<Portrait> getPortraitById(Long id) {
         return portraitRepository.findById(id);
     }
@@ -42,7 +51,7 @@ public class PortraitService {
                             .orElseThrow(() -> new RuntimeException("Portrait not found"));
         Style style = styleService.getStyleById(styleId)
                       .orElseThrow(() -> new RuntimeException("Style not found"));
-        
+
         portrait.setStyle(style);
 
         return portraitRepository.save(portrait);
