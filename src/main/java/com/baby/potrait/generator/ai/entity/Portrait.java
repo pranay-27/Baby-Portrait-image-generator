@@ -5,11 +5,47 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "portraits")
 public class Portrait {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "uploaded_file_name")
+    private String uploadedFileName;
+
+    @Column(name = "uploaded_file_url")
+    private String uploadedFileUrl;
+
+    @Column(name = "generated_image_url")
+    private String generatedImageUrl;
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = true)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "style_id")
+    private Style style;
+
+    public Portrait() {
+        
+    }
+
+    public Portrait(LocalDateTime createdAt, String generatedImageUrl, Long id, Style style, String uploadedFileName, String uploadedFileUrl, User user) {
+        this.createdAt = createdAt;
+        this.generatedImageUrl = generatedImageUrl;
+        this.id = id;
+        this.style = style;
+        this.uploadedFileName = uploadedFileName;
+        this.uploadedFileUrl = uploadedFileUrl;
+        this.user = user;
+    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -65,36 +101,5 @@ public class Portrait {
 
     public void setUploadedFileUrl(String uploadedFileUrl) {
         this.uploadedFileUrl = uploadedFileUrl;
-    }
-
-    private String uploadedFileName;
-
-    private String uploadedFileUrl;
-
-    private String generatedImageUrl;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "style_id")
-    private Style style;
-
-    public Portrait(LocalDateTime createdAt, String generatedImageUrl, Long id, Style style, String uploadedFileName, String uploadedFileUrl, User user) {
-        this.createdAt = createdAt;
-        this.generatedImageUrl = generatedImageUrl;
-        this.id = id;
-        this.style = style;
-        this.uploadedFileName = uploadedFileName;
-        this.uploadedFileUrl = uploadedFileUrl;
-        this.user = user;
-    }
-
-    public Portrait() {
-        
     }
 }

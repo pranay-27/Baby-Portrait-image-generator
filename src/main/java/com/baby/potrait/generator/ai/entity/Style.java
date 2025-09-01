@@ -1,5 +1,6 @@
 package com.baby.potrait.generator.ai.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -8,9 +9,6 @@ import java.util.List;
 @Table(name = "styles")
 public class Style {
 
-    public Style() {
-        
-    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,6 +19,17 @@ public class Style {
     @Column(columnDefinition = "TEXT")
     private String prompt;
 
+    @Column(name = "sample_image_url")
+    private String sampleImageUrl;
+
+    @OneToMany(mappedBy = "style", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Portrait> portraits;
+
+    public Style() {
+        
+    }
+
     public Style(Long id, String name, List<Portrait> portraits, String prompt, String sampleImageUrl) {
         this.id = id;
         this.name = name;
@@ -28,7 +37,6 @@ public class Style {
         this.prompt = prompt;
         this.sampleImageUrl = sampleImageUrl;
     }
-
 
     public Long getId() {
         return id;
@@ -69,9 +77,4 @@ public class Style {
     public void setPrompt(String prompt) {
         this.prompt = prompt;
     }
-
-    private String sampleImageUrl;
-
-    @OneToMany(mappedBy = "style", cascade = CascadeType.ALL)
-    private List<Portrait> portraits;
 }

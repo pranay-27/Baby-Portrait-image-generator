@@ -15,22 +15,21 @@ import java.util.Optional;
 public class PortraitService {
 
     private final PortraitRepository portraitRepository;
-    private UploadService uploadServiceService;
+    private final UploadService uploadService;
     private final StyleService styleService;
 
-
-    public PortraitService(PortraitRepository portraitRepository, UploadService uploadServiceService, StyleService styleService) {
+    public PortraitService(PortraitRepository portraitRepository,
+                           UploadService uploadService,
+                           StyleService styleService) {
         this.portraitRepository = portraitRepository;
-        this.uploadServiceService = uploadServiceService;
+        this.uploadService = uploadService;
         this.styleService = styleService;
     }
 
     public Portrait uploadBabyPhoto(MultipartFile file) throws IOException {
-        String fileUrl = uploadServiceService.uploadFile(file);
-
+        String fileUrl = uploadService.uploadFile(file);
         Portrait portrait = new Portrait();
         portrait.setUploadedFileUrl(fileUrl);
-
         return portraitRepository.save(portrait);
     }
 
@@ -48,42 +47,15 @@ public class PortraitService {
 
     public Portrait selectStyle(Long portraitId, Long styleId) {
         Portrait portrait = portraitRepository.findById(portraitId)
-                            .orElseThrow(() -> new RuntimeException("Portrait not found"));
+                .orElseThrow(() -> new RuntimeException("Portrait not found"));
         Style style = styleService.getStyleById(styleId)
-                      .orElseThrow(() -> new RuntimeException("Style not found"));
+                .orElseThrow(() -> new RuntimeException("Style not found"));
 
         portrait.setStyle(style);
-
         return portraitRepository.save(portrait);
     }
 
-    // public Portrait savePortrait(Portrait portrait) {
-    //     return portraitRepository.save(portrait);
-    // }
-
-    // public List<Portrait> getPortraitsByUser(Long id) {
-    //     return portraitRepository.findByUser(id);
-    // }
-
-    // public List<Portrait> getAllPortraits() {
-    //     return portraitRepository.findAll();
-    // }
-    public Portrait generatePortrait(User user, Style style, String uploadedFileUrl, String uploadedFileName) throws Exception {
-        String generatedImageUrl = callAI(uploadedFileUrl, style.getPrompt());
-        
-
-        Portrait portrait = new Portrait();
-        portrait.setUser(user);
-        portrait.setStyle(style);
-        portrait.setUploadedFileUrl(uploadedFileUrl);
-        portrait.setUploadedFileName(uploadedFileName);
-        portrait.setGeneratedImageUrl(generatedImageUrl);
-
+    public Portrait save(Portrait portrait) {
         return portraitRepository.save(portrait);
-    }
-
-    private String callAI(String uploadedFileUrl, String prompt) {
-        // TODO Auto-generated method stub
-        return "https://res.cloudinary.com/demo/image/upload/generated-baby-portrait.jpg";
     }
 }

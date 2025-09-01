@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,24 +27,40 @@ public class GenerateService {
     @Value("${stability.api.key}")
     private String stabilityApiKey;
 
-    private static final String STABILITY_ENDPOINT = "https://api.stability.ai/v2beta/stable-image/generate/core";
+    private static final String STABILITY_ENDPOINT = "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/image-to-image";
     private final OkHttpClient client;
+    private static final int TARGET_WIDTH = 1024;
+    private static final int TARGET_HEIGHT = 1024;
 
     public GenerateService(UploadService uploadService, StyleService styleService) {
         this.uploadService = uploadService;
         this.styleService = styleService;
 
-        // Configure OkHttpClient with timeouts
         this.client = new OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(60, TimeUnit.SECONDS)
-                .readTimeout(60, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(120, TimeUnit.SECONDS)
+                .readTimeout(300, TimeUnit.SECONDS)
+                .callTimeout(360, TimeUnit.SECONDS)
                 .build();
+    }
+    private File resizeImage(File inputFile, int targetWidth, int targetHeight) throws IOException {
+        BufferedImage originalImage = ImageIO.read(inputFile);
+        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+
+        Graphics2D g = resizedImage.createGraphics();
+        g.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+        g.dispose();
+
+        File resizedFile = new File(inputFile.getParent(), "resized_" + inputFile.getName() + ".png");
+        ImageIO.write(resizedImage, "png", resizedFile);
+
+        return resizedFile;
     }
 
     public String generateImage(MultipartFile originalFile, Long styleId) throws Exception {
         // 1. Upload original to Cloudinary
         String originalUrl = uploadService.uploadFile(originalFile);
+        System.out.println("Original image uploaded to: " + originalUrl);
 
         // 2. Get style info
         var styleOpt = styleService.getStyleById(styleId);
@@ -52,8 +71,10 @@ public class GenerateService {
 
         // 3. Download images locally with unique filenames
         String timestamp = String.valueOf(System.currentTimeMillis());
-        File originalImg = downloadImage(originalUrl, "original_" + timestamp + ".png");
-        File sampleImg = downloadImage(sampleUrl, "sample_" + timestamp + ".png");
+        File originalImg = resizeImage(downloadImage(originalUrl, "original_" + timestamp + ".png"),
+                TARGET_WIDTH, TARGET_HEIGHT);
+        File sampleImg = resizeImage(downloadImage(sampleUrl, "sample_" + timestamp + ".png"),
+                TARGET_WIDTH, TARGET_HEIGHT);
 
         try {
             // 4. Call Stability AI
@@ -83,28 +104,26 @@ public class GenerateService {
             throw new IOException("Style reference image file is missing or empty");
         }
 
-        MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
-        MediaType MEDIA_TYPE_WEBP = MediaType.parse("image/webp");
-        MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpeg");
-
-        // Determine media type based on file extension or content
-        MediaType originalMediaType = getMediaTypeForFile(original);
-        MediaType styleMediaType = getMediaTypeForFile(styleReference);
-
-        // Build multipart request for text-to-image with style influence
+        // Build multipart request for image-to-image generation
         MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 
-        // For core endpoint, we'll use the style as influence in the prompt instead
-        String enhancedPrompt = prompt + ", in the style and composition similar to the reference image provided";
-        builder.addFormDataPart("prompt", enhancedPrompt);
+        // Add the original image as init_image
+        builder.addFormDataPart("init_image", original.getName(), 
+            RequestBody.create(original, MediaType.parse("image/png")));
 
-        // Add the style reference as control image if supported
-        builder.addFormDataPart("control_image", styleReference.getName(), RequestBody.create(styleReference, styleMediaType));
+        // Add the prompt
+        builder.addFormDataPart("text_prompts[0][text]", prompt);
+        builder.addFormDataPart("text_prompts[0][weight]", "1");
+
+        // Add negative prompt
+        builder.addFormDataPart("text_prompts[1][text]", "blurry, low quality, distorted, ugly, bad anatomy");
+        builder.addFormDataPart("text_prompts[1][weight]", "-1");
 
         // Generation parameters
-        builder.addFormDataPart("aspect_ratio", "1:1");
-        builder.addFormDataPart("output_format", "png");
-        builder.addFormDataPart("model", "sd3-large-turbo");
+        builder.addFormDataPart("image_strength", "0.35");
+        builder.addFormDataPart("cfg_scale", "7");
+        builder.addFormDataPart("steps", "30");
+        builder.addFormDataPart("samples", "1");
 
         RequestBody requestBody = builder.build();
 
@@ -130,19 +149,12 @@ public class GenerateService {
 
             JSONObject json = new JSONObject(responseBody);
 
-            // Try different response formats
+            // Parse the response for artifacts
             String base64 = null;
             try {
-                if (json.has("image")) {
-                    // Simple image field
-                    base64 = json.getString("image");
-                } else if (json.has("artifacts") && json.getJSONArray("artifacts").length() > 0) {
-                    // v2beta artifacts format
+                if (json.has("artifacts") && json.getJSONArray("artifacts").length() > 0) {
                     JSONObject artifact = json.getJSONArray("artifacts").getJSONObject(0);
                     base64 = artifact.getString("base64");
-                } else if (json.has("images") && json.getJSONArray("images").length() > 0) {
-                    // Images array format
-                    base64 = json.getJSONArray("images").getString(0);
                 } else {
                     System.err.println("Unknown response format. Available keys: " + json.keySet());
                     throw new IOException("Could not find image data in response. Response keys: " + json.keySet());

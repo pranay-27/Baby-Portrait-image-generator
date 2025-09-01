@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baby Portrait Generator</title>
+    <title>Create Baby Portrait</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"></script>
 </head>
@@ -13,6 +13,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <h1 class="text-2xl font-bold text-purple-600">👶 Baby Portrait AI</h1>
+            <a href="/api/" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
         </div>
     </div>
 </nav>
@@ -26,7 +27,7 @@
         <div class="bg-white shadow rounded-lg p-6 text-center">
             <h2 class="font-semibold text-lg mb-4">Choose Baby Photo</h2>
             <div class="border-dashed border-2 border-gray-300 rounded-lg py-10 cursor-pointer relative hover:border-purple-500">
-                <input type="file" id="fileInput" class="opacity-0 w-full h-full absolute top-0 left-0 cursor-pointer">
+                <input type="file" id="fileInput" class="opacity-0 w-full h-full absolute top-0 left-0 cursor-pointer" accept="image/*">
                 <p id="uploadText" class="text-gray-400 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                     Upload a baby photo
                 </p>
@@ -37,7 +38,7 @@
         <!-- Choose Style -->
         <div class="bg-white shadow rounded-lg p-6">
             <h2 class="font-semibold text-lg mb-4">Choose Portrait Style</h2>
-            <div id="stylesGrid" class="grid grid-cols-3 gap-4"></div>
+            <div id="styles-container" class="grid grid-cols-3 gap-4"></div>
         </div>
 
         <!-- Generate Button -->
@@ -49,14 +50,15 @@
 
         <!-- Loading Spinner -->
         <div id="loadingSpinner" class="hidden text-center my-4">
-            <p class="text-gray-500">Generating portrait, please wait...</p>
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mx-auto"></div>
+            <p class="text-gray-500 mt-2">Generating portrait, please wait...</p>
         </div>
 
         <!-- Generated Image -->
         <div id="resultSection" class="bg-white shadow rounded-lg p-6 text-center hidden">
             <h2 class="font-semibold text-lg mb-4">Generated Portrait</h2>
-            <img id="generatedImage" class="mx-auto mb-4 max-h-96" src="">
-            <a id="downloadBtn" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition" download>Download</a>
+            <img id="generatedImage" class="mx-auto mb-4 max-h-96 rounded" src="">
+            <a id="downloadBtn" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition inline-block" download>Download</a>
         </div>
 
         <!-- Error Message -->
@@ -74,15 +76,6 @@
         </ol>
     </div>
 
-    <div th:if="${generatedUrl}" class="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-lg">
-        <img th:src="${generatedUrl}" alt="Generated Baby Portrait" class="w-full h-auto rounded-lg mb-4"/>
-        <a th:href="${generatedUrl}" download
-           class="block text-center bg-purple-600 text-white py-2 px-6 rounded-full font-semibold hover:bg-purple-700 transition duration-300">
-            Download Portrait
-        </a>
-    </div>
-
-
 </main>
 
 <script>
@@ -97,7 +90,6 @@
     fileInput.addEventListener('change', e => {
         const file = e.target.files[0];
         if (!file) return;
-
         uploadedFile = file;
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -109,27 +101,32 @@
     });
 
     // Fetch styles dynamically
-    axios.get('/api/styles')
-        .then(res => {
-            const stylesGrid = document.getElementById('stylesGrid');
-            res.data.forEach(style => {
-                const div = document.createElement('div');
-                div.className = "rounded overflow-hidden shadow hover:shadow-lg cursor-pointer border";
-                div.innerHTML = `
-                    <img src="${style.imageUrl}" alt="${style.name}" class="w-full h-24 object-cover">
-                    <div class="text-center py-1 text-sm font-medium">${style.name}</div>
-                `;
-                div.addEventListener('click', () => {
-                    document.querySelectorAll('#stylesGrid div').forEach(d => d.classList.remove('border-purple-600', 'border-2'));
-                    div.classList.add('border-purple-600', 'border-2');
-                    selectedStyleId = style.id;
+    function loadStyles() {
+        const container = document.getElementById('styles-container');
+        container.innerHTML = '';
+        fetch('/api/styles')
+            .then(res => res.json())
+            .then(styles => {
+                styles.forEach(style => {
+                    const div = document.createElement('div');
+                    div.className = "rounded overflow-hidden shadow hover:shadow-lg cursor-pointer border-2 border-transparent";
+                    div.innerHTML = `
+                    <img src="${style.sampleImageUrl}" alt="${style.name}" class="w-full h-32 object-contain bg-gray-100 rounded">
+                        <div class="text-center py-1 text-sm font-medium">${style.name}</div>
+                    `;
+                    div.addEventListener('click', () => {
+                        container.querySelectorAll('div').forEach(d => d.classList.remove('border-purple-600'));
+                        div.classList.add('border-purple-600');
+                        selectedStyleId = style.id;
+                    });
+                    container.appendChild(div);
                 });
-                stylesGrid.appendChild(div);
-            });
-        })
-        .catch(err => console.error('Failed to fetch styles:', err));
+            })
+            .catch(err => console.error('Failed to fetch styles:', err));
+    }
+    document.addEventListener('DOMContentLoaded', loadStyles);
 
-    // Generate button
+    // Generate portrait
     document.getElementById('generateBtn').addEventListener('click', () => {
         if (!uploadedFile) return alert('Please upload a baby photo first.');
         if (!selectedStyleId) return alert('Please select a style.');
@@ -138,33 +135,41 @@
         formData.append('file', uploadedFile);
         formData.append('styleId', selectedStyleId);
 
-        // Show spinner and hide previous results/errors
         document.getElementById('loadingSpinner').classList.remove('hidden');
         document.getElementById('resultSection').classList.add('hidden');
         document.getElementById('errorMessage').classList.add('hidden');
 
-            axios.post(`/api/generate/${selectedStyleId}`, formData)
+        axios.post('/api/generate', formData, { headers: { "Content-Type": "multipart/form-data" } })
             .then(res => {
-                const url = res.data;
-                const img = document.getElementById('generatedImage');
-                img.src = url;
-
+                document.getElementById('generatedImage').src = res.data;
                 const downloadBtn = document.getElementById('downloadBtn');
-                downloadBtn.href = url;
-                downloadBtn.download = 'baby-portrait.jpg';
-
+                downloadBtn.onclick = () => {
+                // Fetch the image as blob
+                fetch(res.data)
+                    .then(resp => resp.blob())
+                    .then(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement("a");
+                        link.href = url;
+                        link.download = "baby-portrait.png";
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
+                        URL.revokeObjectURL(url); // cleanup
+                    })
+                    .catch(err => console.error("Download failed:", err));
+            };
                 document.getElementById('resultSection').classList.remove('hidden');
             })
             .catch(err => {
                 console.error(err);
-                const errorDiv = document.getElementById('errorMessage');
-                errorDiv.textContent = 'Failed to generate portrait. ' + (err.response?.data || '');
-                errorDiv.classList.remove('hidden');
+                document.getElementById('errorMessage').innerText = 'Failed to generate portrait';
+                document.getElementById('errorMessage').classList.remove('hidden');
             })
-            .finally(() => {
-                document.getElementById('loadingSpinner').classList.add('hidden');
-            });
+            .f
+            inally(() => document.getElementById('loadingSpinner').classList.add('hidden'));
     });
 </script>
+
 </body>
 </html>
