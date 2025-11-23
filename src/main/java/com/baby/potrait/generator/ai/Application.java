@@ -15,6 +15,7 @@ public class Application {
             dotenv.entries().forEach(entry ->
                 System.setProperty(entry.getKey(), entry.getValue())
             );
+
         } catch (Exception e) {
             System.err.println("Warning: Could not load .env file: " + e.getMessage());
         }
