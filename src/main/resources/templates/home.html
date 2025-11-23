@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Baby Portrait Generator - Turn Your Baby's Photos Into Art</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .testimonial-card {
+            transition: transform 0.3s ease;
+        }
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+        }
+        .pricing-card {
+            transition: all 0.3s ease;
+        }
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .popular-badge {
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .style-card-image {
+        width: 100%;
+        height: 200px;
+        object-fit: contain; /* show full image without cropping */
+        background-color: #f3f3f3; /* optional: makes empty space look nice */
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<nav class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <div class="flex items-center">
+                <h1 class="text-2xl font-bold text-purple-600">👶 Baby Portrait AI</h1>
+            </div>
+            <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-4">
+                    <a href="/api" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="#styles" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">Styles</a>
+                    <a href="#how-it-works" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">How It Works</a>
+                    <a href="#pricing" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">Pricing</a>
+                    <a href="#faq" class="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">FAQ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="gradient-bg text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-5xl font-bold mb-6">Turn Your Baby's Photos Into Art</h1>
+        <p class="text-xl mb-8 max-w-3xl mx-auto">Create stunning AI-generated portraits of your beloved baby in seconds. Professional quality artwork that captures their unique charm.</p>
+        <a href="/api/create">
+            <div class="mb-8">
+                <button class="bg-white text-purple-600 font-bold py-4 px-8 rounded-full text-lg hover:bg-gray-100 transition duration-300 shadow-lg">
+                    <i class="fas fa-magic mr-2"></i>Create Free Portrait
+                </button>
+            </div>
+        </a>
+        <p class="text-lg">Get 2 Free Baby Portraits upon sign up. No credit card required.</p>
+    </div>
+</section>
+
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Our portraits are loved by parents for their quality, realism and heartwarming detail 💖</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="testimonial-card bg-gray-50 p-6 rounded-lg shadow-md">
+                <p class="text-gray-700 mb-4">"Absolutely loved the pictures I generated of Lily. It's now my phone wallpaper and makes me smile every time I unlock my phone."</p>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-3">J</div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Jessica Martinez</p>
+                        <p class="text-sm text-gray-600">Lily, 10 months old</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card bg-gray-50 p-6 rounded-lg shadow-md">
+                <p class="text-gray-700 mb-4">"My kids couldn't stop laughing at seeing Leo in so many funny styles! Love how easy it was to generate so many different styles."</p>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-3">A</div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Andrew Parker</p>
+                        <p class="text-sm text-gray-600">Leo, 3 years old</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card bg-gray-50 p-6 rounded-lg shadow-md">
+                <p class="text-gray-700 mb-4">"We immediately shared Mia's AI portraits with friends and got tons of smiles and compliments. Thank you for creating such a fun app :)"</p>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mr-3">E</div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Emily Bennett</p>
+                        <p class="text-sm text-gray-600">Mia, 1 year old</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card bg-gray-50 p-6 rounded-lg shadow-md">
+                <p class="text-gray-700 mb-4">"I always wanted a regal portrait of my baby, Mason. Ended up trying out all your renaissance styles and they turned out great, I might even get one of them framed."</p>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white font-bold mr-3">J</div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Jamal Robinson</p>
+                        <p class="text-sm text-gray-600">Mason, 6 months old</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card bg-gray-50 p-6 rounded-lg shadow-md">
+                <p class="text-gray-700 mb-4">"The whole process was super quick. I expected it to take a while, but the photos were made in seconds. The app was easy to use and the price is great."</p>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold mr-3">D</div>
+                    <div>
+                        <p class="font-semibold text-gray-900">David Carter</p>
+                        <p class="text-sm text-gray-600">Coco, 2 years old</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card bg-gray-50 p-6 rounded-lg shadow-md">
+                <p class="text-gray-700 mb-4">"My partner was a bit sad over something. I surprised him by sharing a bunch of photos I made of our dear Ella using your app and it turned his mood around. Thank you so much."</p>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white font-bold mr-3">S</div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Sofia Garcia</p>
+                        <p class="text-sm text-gray-600">Ella, 18 months old</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="styles" class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Choose Your Style</h2>
+        <div id="styles-container" class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+            <div id="loading-spinner" class="col-span-full text-center hidden">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mx-auto"></div>
+                <p class="mt-2 text-gray-600">Loading styles...</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="how-it-works" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
+            <p class="text-lg text-gray-600">Create amazing baby portraits in just 3 simple steps</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="bg-purple-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-upload text-3xl text-purple-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">1. Upload Photo</h3>
+                <p class="text-gray-600">Upload clear photos of your baby from different angles for best results</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-purple-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-palette text-3xl text-purple-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">2. Choose Style</h3>
+                <p class="text-gray-600">Select from various artistic styles: Renaissance, Modern, Cartoon, and more</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-purple-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-download text-3xl text-purple-600"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">3. Download Art</h3>
+                <p class="text-gray-600">Get your high-quality baby portraits ready to share, print, or frame</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="pricing" class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Stunning AI Baby Portraits at an Affordable Price</h2>
+            <p class="text-lg text-gray-600">One-time payment. No subscriptions.</p>
+        </div>
+        <div class="flex justify-center items-end space-x-8">
+            <div class="pricing-card bg-white rounded-lg shadow-lg p-8 w-64">
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-gray-900 mb-2">$5</div>
+                    <p class="text-gray-600 mb-6">Basic Package</p>
+                    <ul class="text-left space-y-2 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>10 AI Portraits</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>High Quality</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Multiple Styles</li>
+                    </ul>
+                    <button class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+            <div class="pricing-card bg-white rounded-lg shadow-lg p-8 w-64 relative transform scale-105">
+                <div class="popular-badge absolute -top-3 left-1/2 transform -translate-x-1/2 text-white px-4 py-1 rounded-full text-sm font-bold">
+                    🌟 Most Popular
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-gray-900 mb-2">$10</div>
+                    <p class="text-gray-600 mb-6">Standard Package</p>
+                    <ul class="text-left space-y-2 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>25 AI Portraits</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Premium Quality</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>All Styles</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Fast Processing</li>
+                    </ul>
+                    <button class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition duration-300">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+            <div class="pricing-card bg-white rounded-lg shadow-lg p-8 w-64">
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-gray-900 mb-2">$25</div>
+                    <p class="text-gray-600 mb-6">Premium Package</p>
+                    <ul class="text-left space-y-2 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>75 AI Portraits</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Ultra Quality</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>All Styles</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Priority Support</li>
+                    </ul>
+                    <button class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-300">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="testimonial-card bg-white p-6 rounded-lg shadow-md">
+                <p class="text-gray-700 mb-4">"Initially, I wasn't happy with Oliver's portraits. Preetam kindly explained that the AI results depend heavily on the quality of input photos. Mine were admittedly not great. Even though the issue was on my end, he offered me a full refund anyway. Really impressed with the customer service!"</p>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold mr-3">A</div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Aaliyah Johnson</p>
+                        <p class="text-sm text-gray-600">Oliver, 4 months old</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card bg-white p-6 rounded-lg shadow-md">
+                <p class="text-gray-700 mb-4">"At first, I was skeptical about using AI to create baby portraits of Leo, but the results totally blew me away. I loved the photos so much that I've set them as wallpapers on my phone. I'll definitely be using this app again and help spread the word."</p>
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold mr-3">M</div>
+                    <div>
+                        <p class="font-semibold text-gray-900">Matthew Nolan</p>
+                        <p class="text-sm text-gray-600">Leo, 9 months old</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="faq" class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+            <p class="text-lg text-gray-600">We are here to help you understand how the AI Baby Portrait Generator works. Find answers to all your questions about our service.</p>
+        </div>
+        <div class="space-y-6">
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">How long does it take to generate portraits?</h3>
+                <p class="text-gray-700">Our AI generates beautiful baby portraits in just a few seconds! You'll receive your artwork almost instantly after uploading your baby's photos.</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">What photo quality do I need?</h3>
+                <p class="text-gray-700">For best results, upload clear, well-lit photos of your baby. Multiple angles help our AI understand your baby's features better.</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Can I get a refund if I'm not satisfied?</h3>
+                <p class="text-gray-700">Yes! We offer a full satisfaction guarantee. If you're not happy with your portraits, contact our support team for a full refund.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="gradient-bg text-white py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">Free AI Baby Portrait Generator</h2>
+        <p class="text-xl mb-8">Get 2 Free Baby Portraits upon sign up. No credit card required. Create your first AI baby portrait today!</p>
+        <button class="bg-white text-purple-600 font-bold py-4 px-8 rounded-full text-lg hover:bg-gray-100 transition duration-300 shadow-lg">
+            <i class="fas fa-baby mr-2"></i>Start Creating Now
+        </button>
+    </div>
+</section>
+
+<footer class="bg-gray-900 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h3 class="text-xl font-bold mb-4">👶 Baby Portrait AI</h3>
+                <p class="text-gray-400">Transform your baby's photos into stunning AI-generated artwork.</p>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4">Product</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white">Features</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Pricing</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Gallery</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4">Support</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white">FAQ</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-lg font-semibold mb-4">Legal</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white">Refund Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+            <p class="text-gray-400">&copy; 2025 Baby Portrait AI. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Pricing card hover effects
+        document.querySelectorAll('.pricing-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('scale-105')) {
+                    this.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        // Fetch and display styles immediately on page load
+        const stylesContainer = document.getElementById('styles-container');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        stylesContainer.innerHTML = '';
+        loadingSpinner.style.display = 'block';
+
+        fetch('/api/styles')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(styles => {
+                loadingSpinner.style.display = 'none';
+                styles.forEach(style => {
+                    const styleCard = document.createElement('div');
+                    styleCard.className = "bg-white rounded-lg shadow-md p-6 text-center";
+                    styleCard.innerHTML = `
+                        <img src="${style.sampleImageUrl}" alt="${style.name}" class="style-card-image"/>
+                        <h3 class="text-xl font-semibold mb-2">${style.name}</h3>
+                        <p class="text-gray-600 mb-4">${style.prompt}</p>
+                        <a href="/api/create" class="bg-purple-600 text-white py-2 px-4 rounded-full font-semibold hover:bg-purple-700 transition duration-300">
+                            Select Style
+                        </a>
+                    `;
+                    stylesContainer.appendChild(styleCard);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching styles:', error);
+                loadingSpinner.style.display = 'none';
+                stylesContainer.innerHTML = `<p class="text-center text-red-500">Failed to load styles. Please try again later.</p>`;
+            });
+    });
+</script>
+</body>
+</html>
